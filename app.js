@@ -1,19 +1,52 @@
-require('dotenv').config()
+require("dotenv").config();
 
-const express = require('express')
-const expressLayouts = require('express-ejs-layouts')
-
+const express = require("express");
+const expressLayouts = require("express-ejs-layouts");
+const SpotifyWebApi = require("spotify-web-api-node");
 // require spotify-web-api-node package here:
 
-const app = express()
+const app = express();
 
-app.use(expressLayouts)
-app.set('view engine', 'ejs')
-app.set('views', __dirname + '/views')
-app.use(express.static(__dirname + '/public'))
+app.use(expressLayouts);
+app.set("view engine", "ejs");
+app.set("views", __dirname + "/views");
+app.use(express.static(__dirname + "/public"));
 
 // setting the spotify-api goes here:
+const spotifyApi = new SpotifyWebApi({
+  clientId: process.env.CLIENT_ID,
+  clientSecret: process.env.CLIENT_SECRET,
+});
+
+// Retrieve an access token
+spotifyApi
+  .clientCredentialsGrant()
+  .then((data) => spotifyApi.setAccessToken(data.body["access_token"]))
+  .catch((error) =>
+    console.log("Something went wrong when retrieving an access token", error)
+  );
 
 // Our routes go here:
 
-app.listen(3000, () => console.log('My Spotify project running on port 3000 🎧 🥁 🎸 🔊'))
+app.get("/", (request, response, next) => {
+  console.log(request);
+  response.render("index");
+});
+
+app.get("artist-search", async (request, response) => {
+  const searchArtist = request.query.artist;
+
+  try {
+    const searchResult = await spotifyApi.searchArtists(searchArtist);
+    const results = searchResult.body.artists.items;
+
+    response.render("arist-search-results", { results });
+    // ----> 'HERE WHAT WE WANT TO DO AFTER RECEIVING THE DATA FROM THE API'
+  } catch (err) {
+    console.log("An error occurred: ", err);
+  }
+});
+
+app.listen(3000, () =>
+  console.log("My Spotify project running on port 3000 🎧 🥁 🎸 🔊")
+);

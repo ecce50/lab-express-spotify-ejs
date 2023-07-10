@@ -38,24 +38,24 @@ app.get("/artist-search", (request, response) => {
 
   spotifyApi
     .searchArtists(searchedArtist)
-    .then(data => {
+    .then((data) => {
       console.log("Data from API", data.body);
       const artists = data.body.items;
       response.render("arist-search-results", {
         artists: data.body.artists.items,
       });
     })
-    .catch(err => console.log("An error occurred: ", err));
+    .catch((err) => console.log("An error occurred: ", err));
 });
 
 app.get("/albums/:artistId", (request, response) => {
   spotifyApi
     .getArtistAlbums(request.params.artistId)
-    .then(data => {
+    .then((data) => {
       const albums = data.body.items;
       response.render("albums", { albums });
     })
-    .catch(err => console.log("An error occurred: ", err));
+    .catch((err) => console.log("An error occurred: ", err));
 });
 
 app.get("/tracks/:id", (request, response) => {

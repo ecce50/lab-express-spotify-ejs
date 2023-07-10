@@ -34,16 +34,41 @@ app.get("/", (request, response) => {
 });
 
 app.get("/artist-search", (request, response) => {
-  const searchedArtist = request.query.artist;
+  const searchedArtist = request.query.search;
 
-  spotifyApi.searchArtists(searchedArtist);
-  .then(data => {
-    console.log("Data from API", data.body);
-    response
-      .render("arist-search-results", {artists: data.body.artists.items});
-      })
-    .catch(err => console.log("An error occurred: ", err))
-})
+  spotifyApi
+    .searchArtists(searchedArtist)
+    .then(data => {
+      console.log("Data from API", data.body);
+      const artists = data.body.items;
+      response.render("arist-search-results", {
+        artists: data.body.artists.items,
+      });
+    })
+    .catch(err => console.log("An error occurred: ", err));
+});
+
+app.get("/albums/:artistId", (request, response) => {
+  spotifyApi
+    .getArtistAlbums(request.params.artistId)
+    .then(data => {
+      const albums = data.body.items;
+      response.render("albums", { albums });
+    })
+    .catch(err => console.log("An error occurred: ", err));
+});
+
+app.get("/tracks/:id", (request, response) => {
+  const albumId = request.params.id;
+
+  spotifyApi
+    .getAlbumTracks(albumId)
+    .then((data) => {
+      const albumTracks = data.body.items;
+      response.render("tracks", { albumTracks });
+    })
+    .catch((err) => console.log("An error occurred: ", err));
+});
 
 app.listen(3000, () =>
   console.log("My Spotify project running on port 3000 🎧 🥁 🎸 🔊")

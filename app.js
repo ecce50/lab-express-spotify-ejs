@@ -28,24 +28,22 @@ spotifyApi
 
 // Our routes go here:
 
-app.get("/", async (request, response) => {
+app.get("/", (request, response) => {
   // console.log(request);
-  await response.render("index");
+  response.render("index");
 });
 
-app.get("artist-search", async (request, response) => {
-  const searchedArtist = request.query.artist_name;
+app.get("/artist-search", (request, response) => {
+  const searchedArtist = request.query.artist;
 
-  await spotifyApi.searchArtists(searchedArtist);
-  // .then((data) => {
-  console.log("Data from API", data.body);
-  response
-    .render("arist-search-results", {
-      artists: data.body.artists.items,
-    })
-    // })
-    .catch((err) => console.log("An error occurred: ", err));
-});
+  spotifyApi.searchArtists(searchedArtist);
+  .then(data => {
+    console.log("Data from API", data.body);
+    response
+      .render("arist-search-results", {artists: data.body.artists.items});
+      })
+    .catch(err => console.log("An error occurred: ", err))
+})
 
 app.listen(3000, () =>
   console.log("My Spotify project running on port 3000 🎧 🥁 🎸 🔊")
